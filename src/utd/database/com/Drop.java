@@ -27,7 +27,7 @@ public class Drop {
                 tables.read(bytestbl, 0, bytestbl.length);
                 String tblName = new String(bytestbl);
                 String dbName = new String(bytesDB);
-                if ((isDeletedTable == 0) && (dbName.equals(utility.getSeletedDatabase()))&& tblName.equals(tableName)) {
+                if ((isDeletedTable == 0) && (dbName.equals(utility.getSeletedDatabase())) && tblName.equals(tableName)) {
                     tables.seek(tables.getFilePointer() - tblName.length() - 2L);
                     tables.writeByte(1);
                     break;
@@ -37,7 +37,7 @@ public class Drop {
             tables.close();
 
             File deltable = new File(IUtitlityConstants.DATABASE_PATH + File.separator +
-                    utility.getSeletedDatabase() + File.separator + tableName+".tbl");
+                    utility.getSeletedDatabase() + File.separator + tableName + ".tbl");
             deltable.delete();
             System.out.println("Table is deleted Successfully");
         } catch (Exception e) {
