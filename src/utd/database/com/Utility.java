@@ -57,7 +57,7 @@ public class Utility
 		{
 			if(utility.isTablePresent(tableName, true))
 			{
-				RandomAccessFile table = new RandomAccessFile(utility.getSeletedDatabase() + File.separator + "columns.tbl", "rw");
+				RandomAccessFile table = new RandomAccessFile(IUtitlityConstants.DATABASE_PATH + File.separator + utility.getSeletedDatabase() + File.separator + "columns.tbl", "rw");
 				while (table.getFilePointer() < table.length()) 
 				{
 					int isDeleted = table.readByte();
@@ -146,20 +146,22 @@ public class Utility
 		return DEFAULT_TABLE_COLUMN;
 	}
 
-	public String getSeletedDatabase() {
-		return IUtitlityConstants.DATABASE_PATH + selectedDatabase;
+	public String getSeletedDatabase() 
+	{
+		return selectedDatabase;
 	}
 
 	
-	public void setSeletedDatabase(String seletedDatabase) {
+	public void setSeletedDatabase(String seletedDatabase){
 		this.selectedDatabase = seletedDatabase;
 	}
 
 	public boolean isTablePresent(String tableName, boolean showMessage) {
 		try {
-			File file = new File(utility.getSeletedDatabase() + "." + tableName + ".tbl");
-			if ((file.exists()) && (!file.isDirectory()))
+			File file = new File(IUtitlityConstants.DATABASE_PATH + File.separator + getSeletedDatabase() + File.separator + tableName + ".tbl");
+			if ((file.exists()) && (!file.isDirectory())) {
 				return true;
+			}
 			if (showMessage) {
 				System.out.println("Table " + tableName + " is not present");
 			}

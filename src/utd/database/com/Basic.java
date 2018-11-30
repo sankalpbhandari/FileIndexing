@@ -78,7 +78,7 @@ public class Basic {
 	{
 		try
 		{
-			RandomAccessFile databases = new RandomAccessFile("data" + File.separator + "catalog" + File.separator + "databases.tbl", "rw");
+			RandomAccessFile databases = new RandomAccessFile(IUtitlityConstants.ALL_DATABASE_TBL, "rw");
 			boolean isDatabasePresent = false;
 			while (databases.getFilePointer() < databases.length()) 
 			{

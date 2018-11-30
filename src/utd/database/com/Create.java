@@ -19,21 +19,31 @@ public class Create
 		try
 		{
 			String database = utility.getSeletedDatabase();
+			if(database == null)
+			{
+				System.out.println("Please select database");
+				return;
+			}
 			String[] tokens = getTokens(userCommand);
 			String tableName = tokens[0].trim().split(" ")[2];
-			if (!utility.isTablePresent(tableName, false)) {
+			
+			if(!utility.isTablePresent(tableName, false)) 
+			{
 				tokens[0] = "rowid int";
-				RandomAccessFile tables = new RandomAccessFile(database + ".tables.tbl", "rw");
+				RandomAccessFile tables = new RandomAccessFile(IUtitlityConstants.ALL_TABLE_TBL, "rw");
 				tables.seek(tables.length());
+				tables.writeByte(0);
+				tables.writeByte(database.length());
+				tables.writeBytes(database);				
 				tables.writeByte(0);
 				tables.writeByte(tableName.length());
 				tables.writeBytes(tableName);
-				tables.writeInt(0);
 				tables.close();
-
-				RandomAccessFile columns = new RandomAccessFile(database + ".columns.tbl", "rw");
+					
+				RandomAccessFile columns = new RandomAccessFile(IUtitlityConstants.DATABASE_PATH + File.separator + database + File.separator + "columns.tbl", "rw");
 				columns.seek(columns.length());
 				for (String token : tokens) {
+					
 					token = token.trim();
 					if ((token != null) && (!token.isEmpty())) {
 						columns.writeByte(0);
@@ -43,19 +53,19 @@ public class Create
 						if (token.contains("not nullable")) {
 							token = token.replace("not nullable", "notnullable");
 						}
-						String columnDefination = tableName + "#"
+						String columnAttr = tableName + "#"
 								+ token.replaceAll("  ", " ").replaceAll(" ", "#").trim();
-						columns.writeByte(columnDefination.length());
-						columns.writeBytes(columnDefination);
+						columns.writeByte(columnAttr.length());
+						columns.writeBytes(columnAttr);
 					}
 				}
 				columns.close();
-				RandomAccessFile table = new RandomAccessFile(database + "." + tableName + ".tbl", "rw");
+				RandomAccessFile table = new RandomAccessFile(IUtitlityConstants.DATABASE_PATH + File.separator + database + File.separator + tableName + ".tbl", "rw");
 				table.close();
-				System.out.println("Record is created Successfully");
+				System.out.println("Table is created Successfully");
 			} else {
 				System.out.println("Table is already created");
-			}
+			}	
 		} catch (Exception e) {
 			System.out.println("Error, while Creating a table");
 		}
