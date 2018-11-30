@@ -3,12 +3,6 @@ package utd.database.com;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 
-/**
- * 
- * @author nikitakothari
- *
- *         Delete entry from table
- */
 
 public class Delete {
 

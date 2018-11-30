@@ -95,7 +95,9 @@ public class Create
 			
 			File newDBDir = new File("data" + File.separator + dbName);
 			newDBDir.mkdirs();
-				
+			System.out.println("Database is created Successfully");
+
+
 		}catch(Exception e) {
 			System.out.println(e);
 		}

@@ -2,13 +2,6 @@ package utd.database.com;
 
 import java.io.RandomAccessFile;
 
-/**
- * 
- * @author nikitakothari
- *
- *         Insert values into table
- */
-
 public class Insert {
 
 	Utility utility = Utility.getInstance();

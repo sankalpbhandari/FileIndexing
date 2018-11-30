@@ -17,7 +17,6 @@ public class Utility
 	private final String DEFAULT_DATABASE = null;
 	private final String DEFAULT_TABLE_COLUMN = null;
 	private final long DEFAULT_PAGE_SIZE = 512L;
-	
 	public String selectedDatabase;
 
 	private Utility() 
@@ -146,11 +145,15 @@ public class Utility
 		return DEFAULT_TABLE_COLUMN;
 	}
 
-	public String getSeletedDatabase() 
+	public String getSeletedDatabase()
 	{
-		return selectedDatabase;
+		Basic basic = new Basic();
+		boolean checkDB = basic.checkDatabasePresent(selectedDatabase);
+		if (checkDB)
+			return selectedDatabase;
+		else
+			return null;
 	}
-
 	
 	public void setSeletedDatabase(String seletedDatabase){
 		this.selectedDatabase = seletedDatabase;
