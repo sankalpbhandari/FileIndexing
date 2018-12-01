@@ -45,8 +45,8 @@ public class Create {
                         if (token.contains("primary key")) {
                             token = token.replace("primary key", "primarykey");
                         }
-                        if (token.contains("not nullable")) {
-                            token = token.replace("not nullable", "notnullable");
+                        if (token.contains("not null")) {
+                            token = token.replace("not null", "notnull");
                         }
                         String columnAttr = tableName + "#"
                                 + token.replaceAll("  ", " ").replaceAll(" ", "#").trim();

@@ -12,7 +12,7 @@ public class Delete {
     public void delete(String userCommand) {
         try {
             String[] tokens = userCommand.split(" ");
-            String tableName = tokens[3].trim();
+            String tableName = tokens[2].trim();
             if (utility.isTablePresent(tableName, true)) {
                 String filter = userCommand.substring(userCommand.indexOf("where") + 5, userCommand.length()).trim();
                 String[] filterArray = filter.split("=");

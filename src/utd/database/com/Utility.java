@@ -74,6 +74,15 @@ public class Utility {
         return columns;
     }
 
+    String[] getColumnName(String tableName) {
+        java.util.List<Column> columns = getColumns(tableName);
+        String[] columnNames = new String[columns.size()];
+        for (int i = 0; i < columns.size(); i++) {
+            columnNames[i] = columns.get(i).getColumnName();
+        }
+        return columnNames;
+    }
+
     public void markAllColumnsDeleted(String tableName) {
         try {
             if (utility.isTablePresent(tableName, true)) {

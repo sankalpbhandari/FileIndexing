@@ -2,6 +2,7 @@ package utd.database.com;
 
 import java.io.File;
 import java.io.RandomAccessFile;
+import java.util.Arrays;
 
 class Insert {
 
@@ -16,13 +17,14 @@ class Insert {
     void insertRecord(String userCommand) {
         try {
             String dbName = utility.getSeletedDatabase();
-            if(dbName == null) {
+            if (dbName == null) {
                 System.out.println("Database not Found");
                 return;
             }
             String[] tokens = getTokens(userCommand);
             String tableName = tokens[0].trim().split(" ")[2];
             java.util.List<Column> columns = utility.getColumns(tableName);
+            java.util.List<String> columnNames = Arrays.asList(utility.getColumnName(tableName));
 
             int rows = 0;
             RandomAccessFile table = new RandomAccessFile(IUtitlityConstants.ALL_TABLE_TBL, "rw");
@@ -48,12 +50,32 @@ class Insert {
                 }
             }
             int index = 1;
-            if(tokens.length == 3){
-                index=2;
+            String values[] = new String[columns.size()];
+            for (int i = 0; i < values.length; i++)
+                values[i] = "null";
+            if (tokens.length == 3) {
+                String[] user_cols = tokens[1].replace("values", "").trim().split(",");
+                index = 2;
+                String[] user_values = tokens[index].trim().split(",");
+                if (user_cols.length != user_values.length) {
+                    System.out.println("Incorrect size of tuple");
+                    return;
+                }
+                int new_index;
+                values[0] = "" + rows;
+                for (int i = 0; i < user_cols.length; i++) {
+                    new_index = columnNames.indexOf(user_cols[i].trim());
+                    if (new_index == -1) {
+                        System.out.println("Column " + user_cols[i] + "  not found");
+                        return;
+                    }
+                    values[new_index] = user_values[i].trim();
+                }
             }
-            tokens[index] = (rows + "," + tokens[index]);
-            String[] values = tokens[index].trim().split(",");
-
+            if (index == 1) {
+                tokens[index] = (rows + "," + tokens[index]);
+                values = tokens[index].trim().split(",");
+            }
             int recordSize = 0;
             boolean isError = false;
             if (columns.size() == values.length) {
@@ -99,8 +121,7 @@ class Insert {
                             break;
                     }
                 }
-            }
-            else{
+            } else {
                 System.out.println("Incorrect size of tuple");
                 return;
             }
@@ -108,12 +129,15 @@ class Insert {
             if (!isError) {
                 table.seek(pos);
                 BPlusTree btree = new BPlusTree();
-                BPlusTree.tableName =IUtitlityConstants.DATABASE_PATH + File.separator + utility.getSeletedDatabase() + File.separator + tableName + ".tbl";
+                BPlusTree.tableName = IUtitlityConstants.DATABASE_PATH + File.separator + utility.getSeletedDatabase() + File.separator + tableName + ".tbl";
                 long pointer = btree.insert(recordSize);
                 RandomAccessFile table_data = new RandomAccessFile(BPlusTree.tableName, "rw");
                 table_data.seek(pointer);
                 for (int i = 0; i < values.length; i++) {
-                    switch (columns.get(i).getDataType()) {
+                    String datatype = columns.get(i).getDataType();
+                    if (values[i].equals("null") || values[i] == null)
+                        datatype = "text";
+                    switch (datatype) {
                         case "int":
                             table_data.writeInt(Integer.parseInt(values[i]));
                             break;
@@ -147,13 +171,11 @@ class Insert {
                 table_data.close();
                 System.out.println("Record is inserted Successfully");
             } else {
-                System.out.println("Primary key should be unique");
-                System.out.println("or");
-                System.out.println("Not- Nullable Field can't be null");
+                System.out.println("Primary key should be unique\nor\nNot Null Field can't be null");
             }
             table.close();
         } catch (Exception e) {
-            System.out.println("Error, while inserting a record");
+            System.out.println("Error, while inserting a record ");
         }
     }
 }
