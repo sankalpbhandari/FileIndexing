@@ -1,36 +1,49 @@
 package utd.database.com;
 
+import java.io.File;
 import java.io.RandomAccessFile;
 
-public class Insert {
+class Insert {
 
     Utility utility = Utility.getInstance();
-    SelectWhere selectWhere = new SelectWhere();
+    private SelectWhere selectWhere = new SelectWhere();
 
-    public String[] getTokens(String userCommand) {
+    private String[] getTokens(String userCommand) {
         userCommand = userCommand.replace('(', '#').replace(')', ' ').trim();
         return userCommand.split("#");
     }
 
-    public void insertRecord(String userCommand) {
+    void insertRecord(String userCommand) {
         try {
+            String dbName = utility.getSeletedDatabase();
+            if(dbName == null) {
+                System.out.println("Database not Found");
+                return;
+            }
             String[] tokens = getTokens(userCommand);
             String tableName = tokens[0].trim().split(" ")[2];
             java.util.List<Column> columns = utility.getColumns(tableName);
 
             int rows = 0;
-            RandomAccessFile databases = new RandomAccessFile(utility.getSeletedDatabase() + ".tables.tbl", "rw");
-            long pos = -1L;
-            while (databases.getFilePointer() < databases.length()) {
-                databases.readByte();
-                byte length = databases.readByte();
-                byte[] bytes = new byte[length];
-                databases.read(bytes, 0, bytes.length);
-                String databaseTableName = new String(bytes);
-                pos = databases.getFilePointer();
-                rows = databases.readInt();
-                if (databaseTableName.equals(tableName)) {
+            RandomAccessFile table = new RandomAccessFile(IUtitlityConstants.ALL_TABLE_TBL, "rw");
+            long pos = 0L;
+            while (table.getFilePointer() < table.length()) {
+                table.readByte();
+                byte lengthDB = table.readByte();
+                byte[] bytes = new byte[lengthDB];
+                table.read(bytes, 0, bytes.length);
+                table.readByte();
+                byte lengthTable = table.readByte();
+                byte[] bytestbl = new byte[lengthTable];
+                table.read(bytestbl, 0, bytestbl.length);
+                rows = table.readInt();
+                String databaseName = new String(bytes);
+                String databaseTableName = new String(bytestbl);
+                pos = table.getFilePointer();
+                if (databaseTableName.equals(tableName) && databaseName.equals(utility.getSeletedDatabase())) {
                     rows++;
+                    table.seek(table.getFilePointer() - 4L);
+                    table.writeInt(rows);
                     break;
                 }
             }
@@ -42,77 +55,96 @@ public class Insert {
             boolean isError = false;
             if (columns.size() == values.length) {
                 for (int i = 0; i < values.length; i++) {
-                    if ((((Column) columns.get(i)).isNotNullable()) || (((Column) columns.get(i)).isPrimary())) {
-                        if ((values[i] == null) || (values[i] == "null")) {
+                    if ((columns.get(i).isNotNullable()) || (columns.get(i).isPrimary())) {
+                        if ((values[i] == null) || (values[i].equals("null"))) {
                             isError = true;
                         }
-                        if (((Column) columns.get(i)).isPrimary()) {
+                        if (columns.get(i).isPrimary()) {
                             isError = selectWhere.isKeyAlreadyPresent("select * from " + tableName + " where "
-                                    + ((Column) columns.get(i)).getColumnName() + "=" + values[i]);
+                                    + columns.get(i).getColumnName() + "=" + values[i]);
                         }
                         if (isError)
                             break;
                     }
-                    if (((Column) columns.get(i)).getDataType().equals("int")) {
-                        recordSize += 4;
-                    } else if (((Column) columns.get(i)).getDataType().equals("tinyint")) {
-                        recordSize++;
-                    } else if (((Column) columns.get(i)).getDataType().equals("smallint")) {
-                        recordSize += 2;
-                    } else if (((Column) columns.get(i)).getDataType().equals("bigint")) {
-                        recordSize += 8;
-                    } else if (((Column) columns.get(i)).getDataType().equals("real")) {
-                        recordSize += 4;
-                    } else if (((Column) columns.get(i)).getDataType().equals("double")) {
-                        recordSize += 8;
-                    } else if (((Column) columns.get(i)).getDataType().equals("date")) {
-                        recordSize += 8;
-                    } else if (((Column) columns.get(i)).getDataType().equals("datetime")) {
-                        recordSize += 8;
-                    } else {
-                        recordSize += values[i].length() + 1;
+                    switch (columns.get(i).getDataType()) {
+                        case "int":
+                            recordSize += 4;
+                            break;
+                        case "tinyint":
+                            recordSize++;
+                            break;
+                        case "smallint":
+                            recordSize += 2;
+                            break;
+                        case "bigint":
+                            recordSize += 8;
+                            break;
+                        case "real":
+                            recordSize += 4;
+                            break;
+                        case "double":
+                            recordSize += 8;
+                            break;
+                        case "date":
+                            recordSize += 8;
+                            break;
+                        case "datetime":
+                            recordSize += 8;
+                            break;
+                        default:
+                            recordSize += values[i].length() + 1;
+                            break;
                     }
                 }
             }
 
             if (!isError) {
-                databases.seek(pos);
-                databases.writeInt(rows);
+                table.seek(pos);
                 BPlusTree btree = new BPlusTree();
-                BPlusTree.tableName = utility.getSeletedDatabase() + "." + tableName + ".tbl";
+                BPlusTree.tableName =IUtitlityConstants.DATABASE_PATH + File.separator + utility.getSeletedDatabase() + File.separator + tableName + ".tbl";
                 long pointer = btree.insert(recordSize);
-                RandomAccessFile table = new RandomAccessFile(BPlusTree.tableName, "rw");
-                table.seek(pointer);
+                RandomAccessFile table_data = new RandomAccessFile(BPlusTree.tableName, "rw");
+                table_data.seek(pointer);
                 for (int i = 0; i < values.length; i++) {
-                    if (((Column) columns.get(i)).getDataType().equals("int")) {
-                        table.writeInt(Integer.parseInt(values[i]));
-                    } else if (((Column) columns.get(i)).getDataType().equals("tinyint")) {
-                        table.writeByte(Byte.parseByte(values[i]));
-                    } else if (((Column) columns.get(i)).getDataType().equals("smallint")) {
-                        table.writeInt(Short.parseShort(values[i]));
-                    } else if (((Column) columns.get(i)).getDataType().equals("bigint")) {
-                        table.writeLong(Long.parseLong(values[i]));
-                    } else if (((Column) columns.get(i)).getDataType().equals("real")) {
-                        table.writeFloat(Float.parseFloat(values[i]));
-                    } else if (((Column) columns.get(i)).getDataType().equals("double")) {
-                        table.writeDouble(Double.parseDouble(values[i]));
-                    } else if (((Column) columns.get(i)).getDataType().equals("date")) {
-                        table.writeLong(utility.convertStringToDate(values[i]));
-                    } else if (((Column) columns.get(i)).getDataType().equals("datetime")) {
-                        table.writeLong(Long.parseLong(values[i]));
-                    } else {
-                        table.writeByte(values[i].length());
-                        table.writeBytes(values[i]);
+                    switch (columns.get(i).getDataType()) {
+                        case "int":
+                            table_data.writeInt(Integer.parseInt(values[i]));
+                            break;
+                        case "tinyint":
+                            table_data.writeByte(Byte.parseByte(values[i]));
+                            break;
+                        case "smallint":
+                            table_data.writeInt(Short.parseShort(values[i]));
+                            break;
+                        case "bigint":
+                            table_data.writeLong(Long.parseLong(values[i]));
+                            break;
+                        case "real":
+                            table_data.writeFloat(Float.parseFloat(values[i]));
+                            break;
+                        case "double":
+                            table_data.writeDouble(Double.parseDouble(values[i]));
+                            break;
+                        case "date":
+                            table_data.writeLong(utility.convertStringToDate(values[i]));
+                            break;
+                        case "datetime":
+                            table_data.writeLong(Long.parseLong(values[i]));
+                            break;
+                        default:
+                            table_data.writeByte(values[i].length());
+                            table_data.writeBytes(values[i]);
+                            break;
                     }
                 }
-                table.close();
+                table_data.close();
                 System.out.println("Record is inserted Successfully");
             } else {
                 System.out.println("Primary key should be unique");
                 System.out.println("or");
                 System.out.println("Nullable Field can't be null");
             }
-            databases.close();
+            table.close();
         } catch (Exception e) {
             System.out.println("Error, while inserting a record");
         }

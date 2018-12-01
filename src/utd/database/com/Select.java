@@ -1,5 +1,7 @@
 package utd.database.com;
 
+import javax.print.attribute.standard.Fidelity;
+import java.io.File;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 
@@ -15,7 +17,8 @@ public class Select {
             String[] tokens = userCommand.split(" ");
             String tableName = tokens[3].trim();
             if (utility.isTablePresent(tableName, true)) {
-                RandomAccessFile table = new RandomAccessFile(utility.getSeletedDatabase() + "." + tableName + ".tbl",
+                RandomAccessFile table = new RandomAccessFile(IUtitlityConstants.DATABASE_PATH+
+                        File.separator+utility.getSeletedDatabase() + File.separator + tableName + ".tbl",
                         "rw");
                 if (table.length() > 0L) {
                     java.util.List<Column> columns = utility.getColumns(tableName);

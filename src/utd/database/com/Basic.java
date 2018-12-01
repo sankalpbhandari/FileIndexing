@@ -24,11 +24,11 @@ class Basic {
                     byte lengthTable = table.readByte();
                     byte[] bytestbl = new byte[lengthTable];
                     table.read(bytestbl, 0, bytestbl.length);
+                    table.readInt();
                     if (isDeletedDB == 0 && isDeletedTable == 0 && new String(bytes).equals(utility.getSeletedDatabase())) {
                         isRecordPresent = true;
                         System.out.println(new String(bytestbl));
                     }
-//				table.readByte();
                 }
                 if (!isRecordPresent)
                     System.out.println("No table is present for " + utility.getSeletedDatabase() + " database");

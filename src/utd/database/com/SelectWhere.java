@@ -1,5 +1,6 @@
 package utd.database.com;
 
+import java.io.File;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 
@@ -17,8 +18,10 @@ public class SelectWhere {
             if (utility.isTablePresent(tableName, true)) {
                 String filter = userCommand.substring(userCommand.indexOf("where") + 5, userCommand.length()).trim();
                 String[] filterArray = filter.split("=");
-                RandomAccessFile table = new RandomAccessFile(utility.getSeletedDatabase() + "." + tableName + ".tbl",
+                RandomAccessFile table = new RandomAccessFile(IUtitlityConstants.DATABASE_PATH+
+                        File.separator+utility.getSeletedDatabase() + File.separator + tableName + ".tbl",
                         "rw");
+                boolean isRecordPresent = false;
                 if (table.length() > 0L) {
                     java.util.List<Column> columns = utility.getColumns(tableName);
 
@@ -113,7 +116,7 @@ public class SelectWhere {
                                     int length = table.readByte();
                                     byte[] bytes = new byte[length];
                                     table.read(bytes, 0, bytes.length);
-                                    String value = " " + new String(bytes);
+                                    String value = new String(bytes);
                                     if (column.getColumnName().equals(filterArray[0])) {
                                         if (!value.equals(filterArray[1]))
                                             break;
@@ -122,9 +125,12 @@ public class SelectWhere {
 
                                     displayString = displayString + " " + value;
                                 }
-                                if (isDisplay.booleanValue())
-                                    System.out.println(displayString);
                             }
+                                if (isDisplay.booleanValue())
+                                {
+                                    isRecordPresent = true;
+                                    System.out.println(displayString);
+                                }
                         }
                         if (rightPointer != 0L) {
                             table.seek(rightPointer);
@@ -140,7 +146,7 @@ public class SelectWhere {
                             nextPage = false;
                         }
                     }
-                } else {
+                } if(!isRecordPresent){
                     System.out.println("No record present");
                 }
                 table.close();
@@ -157,7 +163,8 @@ public class SelectWhere {
             if (utility.isTablePresent(tableName, true)) {
                 String filter = userCommand.substring(userCommand.indexOf("where") + 5, userCommand.length()).trim();
                 String[] filterArray = filter.split("=");
-                RandomAccessFile table = new RandomAccessFile(utility.getSeletedDatabase() + "." + tableName + ".tbl",
+                RandomAccessFile table = new RandomAccessFile(IUtitlityConstants.DATABASE_PATH+
+                        File.separator+utility.getSeletedDatabase() + File.separator + tableName + ".tbl",
                         "rw");
                 if (table.length() > 0L) {
                     java.util.List<Column> columns = utility.getColumns(tableName);

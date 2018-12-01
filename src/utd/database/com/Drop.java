@@ -32,6 +32,7 @@ public class Drop {
                     tables.writeByte(1);
                     break;
                 }
+                tables.readInt();
             }
 
             tables.close();

@@ -32,6 +32,7 @@ public class Create {
                 tables.writeByte(0);
                 tables.writeByte(tableName.length());
                 tables.writeBytes(tableName);
+                tables.writeInt(0);
                 tables.close();
 
                 RandomAccessFile columns = new RandomAccessFile(IUtitlityConstants.DATABASE_PATH + File.separator + database + File.separator + "columns.tbl", "rw");
@@ -61,7 +62,7 @@ public class Create {
                 System.out.println("Table is already created");
             }
         } catch (Exception e) {
-            System.out.println("Error, while Creating a table");
+            System.out.println("Error, while Creating a table"+e.getMessage());
         }
     }
 
