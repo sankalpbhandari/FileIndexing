@@ -1,5 +1,6 @@
 package utd.database.com;
 
+import java.io.File;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 
@@ -15,8 +16,8 @@ public class Delete {
             if (utility.isTablePresent(tableName, true)) {
                 String filter = userCommand.substring(userCommand.indexOf("where") + 5, userCommand.length()).trim();
                 String[] filterArray = filter.split("=");
-                RandomAccessFile table = new RandomAccessFile(utility.getSeletedDatabase() + "." + tableName + ".tbl",
-                        "rw");
+                RandomAccessFile table = new RandomAccessFile(IUtitlityConstants.DATABASE_PATH +
+                        File.separator + utility.getSeletedDatabase() + File.separator + tableName + ".tbl","rw");
 
                 if (table.length() > 0L) {
                     java.util.List<Column> columns = utility.getColumns(tableName);
@@ -89,13 +90,15 @@ public class Delete {
                                     byte[] bytes = new byte[length];
                                     table.read(bytes, 0, bytes.length);
                                     String value = " " + new String(bytes);
+                                    if(value!=" ")
+                                        value = value.trim();
                                     if ((column.getColumnName().equals(filterArray[0]))
                                             && (value.equals(filterArray[1]))) {
                                         isRemove = true;
                                     }
                                 }
-                            }
 
+                            }
                             if (!isRemove)
                                 keep.add((Short) cellPointers.get(i));
                         }
