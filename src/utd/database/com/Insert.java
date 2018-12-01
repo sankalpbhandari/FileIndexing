@@ -47,9 +47,12 @@ class Insert {
                     break;
                 }
             }
-
-            tokens[1] = (rows + "," + tokens[1]);
-            String[] values = tokens[1].trim().split(",");
+            int index = 1;
+            if(tokens.length == 3){
+                index=2;
+            }
+            tokens[index] = (rows + "," + tokens[index]);
+            String[] values = tokens[index].trim().split(",");
 
             int recordSize = 0;
             boolean isError = false;
@@ -97,6 +100,10 @@ class Insert {
                     }
                 }
             }
+            else{
+                System.out.println("Incorrect size of tuple");
+                return;
+            }
 
             if (!isError) {
                 table.seek(pos);
@@ -142,7 +149,7 @@ class Insert {
             } else {
                 System.out.println("Primary key should be unique");
                 System.out.println("or");
-                System.out.println("Nullable Field can't be null");
+                System.out.println("Not- Nullable Field can't be null");
             }
             table.close();
         } catch (Exception e) {
