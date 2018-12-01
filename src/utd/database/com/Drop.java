@@ -16,7 +16,7 @@ public class Drop {
             }
             RandomAccessFile tables = new RandomAccessFile(IUtitlityConstants.ALL_TABLE_TBL, "rw");
             while (tables.getFilePointer() < tables.length()) {
-                int isDeletedDB = tables.readByte();
+                tables.readByte();
                 byte lengthDB = tables.readByte();
                 byte[] bytesDB = new byte[lengthDB];
                 tables.read(bytesDB, 0, bytesDB.length);

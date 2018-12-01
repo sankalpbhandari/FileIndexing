@@ -7,7 +7,7 @@ public class Create {
 
     Utility utility = Utility.getInstance();
 
-    public String[] getTokens(String userCommand) {
+    private String[] getTokens(String userCommand) {
         userCommand = userCommand.replace('(', '#').replace(',', '#').replace(')', ' ').trim();
         return userCommand.split("#");
     }
@@ -39,7 +39,7 @@ public class Create {
                 for (String token : tokens) {
 
                     token = token.trim();
-                    if ((token != null) && (!token.isEmpty())) {
+                    if (!token.isEmpty()) {
                         columns.writeByte(0);
                         if (token.contains("primary key")) {
                             token = token.replace("primary key", "primarykey");
@@ -90,7 +90,7 @@ public class Create {
 
 
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println(e.getMessage());
         }
 
     }

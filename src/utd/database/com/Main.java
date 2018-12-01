@@ -5,32 +5,36 @@ import java.util.ArrayList;
 
 public class Main {
 
-    public static boolean isExit = false;
-    public static java.util.Scanner scanner = new java.util.Scanner(System.in).useDelimiter(";");
+    private static java.util.Scanner scanner = new java.util.Scanner(System.in).useDelimiter(";");
 
     static Utility utility = Utility.getInstance();
-    static Help help = new Help();
-    static Select select = new Select();
-    static SelectWhere selectWhere = new SelectWhere();
-    static Create create = new Create();
-    static Basic basic = new Basic();
-    static Insert insert = new Insert();
-    static Drop drop = new Drop();
-    static Delete delete = new Delete();
+    private static Help help = new Help();
+    private static Select select = new Select();
+    private static SelectWhere selectWhere = new SelectWhere();
+    private static Create create = new Create();
+    private static Basic basic = new Basic();
+    private static Insert insert = new Insert();
+    private static Drop drop = new Drop();
+    private static Delete delete = new Delete();
+    private static boolean isExit = false;
 
     public static void main(String[] args) {
         Utility.splashScreen();
-        String userCommand = "";
-        while (!isExit) {
-            System.out.print(utility.getPrompt());
-            userCommand = scanner.next().replace("\n", "").replace("\r", "").trim().toLowerCase();
-            parseUserCommand(userCommand);
+        String userCommand;
+        try {
+            while (!isExit) {
+
+                System.out.print(utility.getPrompt());
+                userCommand = scanner.next().replace("\n", "").replace("\r", "").trim().toLowerCase();
+                parseUserCommand(userCommand);
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
-        System.out.println("Exiting...");
     }
 
     private static void parseUserCommand(String userCommand) {
-        ArrayList<String> commandTokens = new ArrayList<String>(java.util.Arrays.asList(userCommand.split(" ")));
+        ArrayList<String> commandTokens = new ArrayList<>(java.util.Arrays.asList(userCommand.split(" ")));
 
         String operation = commandTokens.get(0);
         switch (operation) {
@@ -80,7 +84,7 @@ public class Main {
                 break;
 
             case "exit":
-                System.exit(0);
+                isExit = true;
                 break;
 
             case "help":
@@ -88,7 +92,7 @@ public class Main {
                 break;
 
             case "quit":
-                System.exit(0);
+                isExit = true;
                 break;
 
             case "show":

@@ -3,17 +3,16 @@ package utd.database.com;
 import java.io.RandomAccessFile;
 
 
-public class Basic {
+class Basic {
 
     Utility utility = Utility.getInstance();
 
-    public void showTables() {
+    void showTables() {
         try {
             RandomAccessFile table = new RandomAccessFile(IUtitlityConstants.ALL_TABLE_TBL, "rw");
             boolean isRecordPresent = false;
             if (utility.getSeletedDatabase() == null) {
                 System.out.println("The database is deleted");
-                return;
             } else {
                 while (table.getFilePointer() < table.length()) {
 
@@ -41,7 +40,7 @@ public class Basic {
 
     }
 
-    public void showDatabases() {
+    void showDatabases() {
         try {
             java.io.File file = new java.io.File(IUtitlityConstants.ALL_DATABASE_TBL);
             if ((file.exists()) && (!file.isDirectory())) {
@@ -68,7 +67,7 @@ public class Basic {
         }
     }
 
-    public boolean checkDatabasePresent(String databaseName) {
+    boolean checkDatabasePresent(String databaseName) {
         try {
             utility.setSeletedDatabase(null);
             RandomAccessFile databases = new RandomAccessFile(IUtitlityConstants.ALL_DATABASE_TBL, "rw");
@@ -91,7 +90,7 @@ public class Basic {
         return false;
     }
 
-    public void useDatabase(String databaseName) {
+    void useDatabase(String databaseName) {
         boolean isDatabasePresent;
         isDatabasePresent = checkDatabasePresent(databaseName);
         if (isDatabasePresent)

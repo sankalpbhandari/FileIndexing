@@ -3,29 +3,27 @@ package utd.database.com;
 import java.io.RandomAccessFile;
 
 
-public class BPlusTree {
-    static Long currentPointer = null;
+class BPlusTree {
+    private static Long currentPointer = null;
     static String tableName = "";
     Utility utility = Utility.getInstance();
 
-    public boolean writeLeafHeader(long pageStart, long pageEnd, int recordSize, int rightPointer) {
+    private void writeLeafHeader(long pageStart, long pageEnd, int recordSize) {
         try {
             RandomAccessFile table = new RandomAccessFile(tableName, "rw");
             table.seek(pageStart);
             table.writeByte(1);
             table.writeByte(1);
             table.writeShort((int) (pageEnd - recordSize));
-            table.writeInt(rightPointer);
+            table.writeInt(0);
             table.writeShort((int) (pageEnd - recordSize));
-            currentPointer = Long.valueOf(pageEnd - recordSize);
+            currentPointer = pageEnd - recordSize;
             table.close();
-            return true;
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
-        return false;
     }
 
-    public boolean updateLeafHeader(long pageStart, long pageEnd, int recordSize, int rightPointer) {
+    private void updateLeafHeader(long pageStart, int recordSize, int rightPointer) {
         try {
             RandomAccessFile table = new RandomAccessFile(tableName, "rw");
             table.seek(pageStart);
@@ -42,19 +40,17 @@ public class BPlusTree {
             table.writeInt(rightPointer);
 
             short[] cellAddress = new short[cells];
-            for (int i = 0; i < cells - 1; i++) {
+            for (int i = 0; i < cells - 1; i++)
                 cellAddress[i] = table.readShort();
-            }
+
             table.writeShort(newCellAddress);
-            currentPointer = Long.valueOf(newCellAddress);
+            currentPointer = (long) newCellAddress;
             table.close();
-            return true;
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
-        return false;
     }
 
-    public boolean updateRightPointerOfLeafHeader(long pageStart, long pageEnd, int recordSize, int rightPointer) {
+    private void updateRightPointerOfLeafHeader(long pageStart, int rightPointer) {
         try {
             RandomAccessFile table = new RandomAccessFile(tableName, "rw");
             table.seek(pageStart);
@@ -63,15 +59,12 @@ public class BPlusTree {
             table.readShort();
             table.writeInt(rightPointer);
             table.close();
-            return true;
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
-        return false;
     }
 
-    public int getLastId(long pageStart) {
+    private int getLastId(long pageStart) {
         try {
-            int lastId = 0;
             RandomAccessFile table = new RandomAccessFile(tableName, "rw");
             table.seek(pageStart + utility.getPageSize());
             table.readByte();
@@ -79,15 +72,15 @@ public class BPlusTree {
             int lastAddress = table.readShort();
             table.writeInt(0);
             table.seek(lastAddress);
-            lastId = table.readInt();
+            int lastId = table.readInt();
             table.close();
             return lastId;
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         return 0;
     }
 
-    public void checkInteriorPageOverflow(long pagePointer) {
+    private void checkInteriorPageOverflow(long pagePointer) {
         if (pagePointer != 0L) {
             try {
                 RandomAccessFile table = new RandomAccessFile(tableName, "rw");
@@ -170,7 +163,7 @@ public class BPlusTree {
         }
     }
 
-    public void checkOverflow() {
+    private void checkOverflow() {
         try {
             RandomAccessFile table = new RandomAccessFile(tableName, "rw");
             long newPageStart = utility.getPageSize() * (table.length() / utility.getPageSize() + 2L);
@@ -198,7 +191,7 @@ public class BPlusTree {
                     table.close();
                 } else {
                     table.seek(pagePointer);
-                    int pageType = table.readByte();
+                    int pageType;
                     table.readInt();
                     table.readInt();
                     long rightPointer = table.readInt();
@@ -216,9 +209,8 @@ public class BPlusTree {
                     }
 
                     while (rightMostPointer != 0L) {
-                        pagePointer = rightMostPointer;
                         table.seek(rightMostPointer);
-                        pageType = table.readByte();
+                        table.readByte();
                         table.readInt();
                         table.readInt();
                         rightPointer = table.readInt();
@@ -281,17 +273,18 @@ public class BPlusTree {
         }
     }
 
-    public long insert(int recordSize) {
+    long insert(int recordSize) {
         try {
             RandomAccessFile table = new RandomAccessFile(tableName, "rw");
             long filelength = table.length();
-            long fileIndex = table.getFilePointer();
+            table.getFilePointer();
+            long fileIndex;
             long pageStart = 0L;
             long pageEnd = pageStart + utility.getPageSize() - 1L;
             if (filelength == 0L) {
                 table.close();
-                writeLeafHeader(pageStart, pageEnd, recordSize, 0);
-                return currentPointer.longValue();
+                writeLeafHeader(pageStart, pageEnd, recordSize);
+                return currentPointer;
             }
 
             int pageType = table.readByte();
@@ -306,24 +299,24 @@ public class BPlusTree {
                 rightPointer = table.readInt();
             }
 
-            if ((pageType == 1) && (rightPointer == 0)) {
+            if (pageType == 1) {
                 fileIndex = table.getFilePointer();
                 table.close();
                 pageStart = fileIndex - 8L;
                 pageEnd = pageStart + utility.getPageSize();
                 cells++;
                 if (startPointer - recordSize > pageStart + 8L + 2 * cells) {
-                    updateLeafHeader(pageStart, pageEnd, recordSize, rightPointer);
+                    updateLeafHeader(pageStart, recordSize, rightPointer);
                 } else {
                     rightPointer = (int) ((filelength + 1L) / utility.getPageSize() * utility.getPageSize());
-                    updateRightPointerOfLeafHeader(pageStart, pageEnd, recordSize, rightPointer);
-                    writeLeafHeader(rightPointer, rightPointer + utility.getPageSize() - 1L, recordSize, 0);
+                    updateRightPointerOfLeafHeader(pageStart, rightPointer);
+                    writeLeafHeader(rightPointer, rightPointer + utility.getPageSize() - 1L, recordSize);
                     checkOverflow();
                 }
             }
             table.close();
-            return currentPointer.longValue();
-        } catch (Exception e) {
+            return currentPointer;
+        } catch (Exception ignored) {
         }
         return 0L;
     }

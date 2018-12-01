@@ -9,13 +9,9 @@ import java.util.List;
 
 public class Utility {
     private static Utility utility = new Utility();
-    private final String PROMPT = "DavisBaseLite>";
-    private final String VERSION = "v1.0.0";
-    private final String COPY_RIGHT = "©2018 Divyesh Meet Sankalp Shraddha";
     private final String DEFAULT_DATABASE = null;
     private final String DEFAULT_TABLE_COLUMN = null;
-    private final long DEFAULT_PAGE_SIZE = 512L;
-    public String selectedDatabase;
+    private String selectedDatabase;
 
     private Utility() {
 
@@ -25,25 +21,25 @@ public class Utility {
         return utility;
     }
 
-    public static String displayLine(String displayChar, int num) {
-        String displayString = "";
-        for (int i = 0; i < num; i++) {
-            displayString += displayChar;
+    static String displayLine(String displayChar) {
+        StringBuilder displayString = new StringBuilder();
+        for (int i = 0; i < 80; i++) {
+            displayString.append(displayChar);
         }
-        return displayString;
+        return displayString.toString();
     }
 
-    public static void splashScreen() {
-        System.out.println(displayLine("-", 80));
+    static void splashScreen() {
+        System.out.println(displayLine("-"));
         System.out.println("Welcome to DavisBaseLite");
         System.out.println("DavisBaseLite Version " + getInstance().getVersion());
         System.out.println(getInstance().getCopyRight());
         System.out.println("\nType \"help;\" to display supported commands.");
-        System.out.println(displayLine("-", 80));
+        System.out.println(displayLine("-"));
     }
 
-    public List<Column> getColumns(String tableName) {
-        List<Column> columns = new java.util.ArrayList<Column>();
+    List<Column> getColumns(String tableName) {
+        List<Column> columns = new java.util.ArrayList<>();
         try {
             if (utility.isTablePresent(tableName, true)) {
                 RandomAccessFile table = new RandomAccessFile(IUtitlityConstants.DATABASE_PATH + File.separator + utility.getSeletedDatabase() + File.separator + "columns.tbl", "rw");
@@ -102,20 +98,20 @@ public class Utility {
         }
     }
 
-    public String getPrompt() {
-        return PROMPT;
+    String getPrompt() {
+        return IUtitlityConstants.PROMPT;
     }
 
-    public String getVersion() {
-        return VERSION;
+    String getVersion() {
+        return IUtitlityConstants.VERSION;
     }
 
-    public String getCopyRight() {
-        return COPY_RIGHT;
+    private String getCopyRight() {
+        return IUtitlityConstants.COPYRIGHT;
     }
 
-    public long getPageSize() {
-        return this.DEFAULT_PAGE_SIZE;
+    long getPageSize() {
+        return IUtitlityConstants.PAGESIZE;
     }
 
     public String getDefaultDatabase() {
@@ -126,7 +122,7 @@ public class Utility {
         return DEFAULT_TABLE_COLUMN;
     }
 
-    public String getSeletedDatabase() {
+    String getSeletedDatabase() {
         Basic basic = new Basic();
         boolean checkDB = basic.checkDatabasePresent(selectedDatabase);
         if (checkDB)
@@ -135,11 +131,11 @@ public class Utility {
             return null;
     }
 
-    public void setSeletedDatabase(String seletedDatabase) {
+    void setSeletedDatabase(String seletedDatabase) {
         this.selectedDatabase = seletedDatabase;
     }
 
-    public boolean isTablePresent(String tableName, boolean showMessage) {
+    boolean isTablePresent(String tableName, boolean showMessage) {
         try {
             File file = new File(IUtitlityConstants.DATABASE_PATH + File.separator + getSeletedDatabase() + File.separator + tableName + ".tbl");
             if ((file.exists()) && (!file.isDirectory())) {
@@ -155,7 +151,7 @@ public class Utility {
         return false;
     }
 
-    public long convertStringToDate(String dateString) {
+    long convertStringToDate(String dateString) {
         String pattern = "MM:dd:yyyy";
         SimpleDateFormat format = new SimpleDateFormat(pattern);
         try {
@@ -167,26 +163,23 @@ public class Utility {
         return new Date().getTime();
     }
 
-    public String convertDateToString(long date) {
+    String convertDateToString(long date) {
         String pattern = "MM:dd:yyyy";
         SimpleDateFormat format = new SimpleDateFormat(pattern);
         Date d = new Date(date);
         return format.format(d);
     }
 
-    public String convertDateTimeToString(long date) {
+    String convertDateTimeToString(long date) {
         String pattern = "YYYY-MM-DD_hh:mm:ss";
         SimpleDateFormat format = new SimpleDateFormat(pattern);
         Date d = new Date(date);
         return format.format(d);
     }
 
-    public boolean isDatabaseExist(String dbName) {
+    boolean isDatabaseExist(String dbName) {
         File dBFile = new File("data" + File.separator + dbName);
-        if (dBFile.exists())
-            return true;
-        else
-            return false;
+        return dBFile.exists();
     }
 
     public String getDATABASE_PATH() {

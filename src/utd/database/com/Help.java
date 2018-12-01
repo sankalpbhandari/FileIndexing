@@ -1,9 +1,9 @@
 package utd.database.com;
 
-public class Help {
+class Help {
 
-    public void get() {
-        System.out.println(Utility.displayLine("*", 80));
+    void get() {
+        System.out.println(Utility.displayLine("*"));
         System.out.println("SUPPORTED COMMANDS");
         System.out.println("All commands below are case insensitive");
         System.out.println();
@@ -26,6 +26,6 @@ public class Help {
         System.out.println("\tEXIT;                                            Exit the program");
         System.out.println();
         System.out.println();
-        System.out.println(Utility.displayLine("*", 80));
+        System.out.println(Utility.displayLine("*"));
     }
 }
