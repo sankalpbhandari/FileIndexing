@@ -7,7 +7,7 @@ import java.util.Arrays;
 class Insert {
 
     Utility utility = Utility.getInstance();
-    private SelectWhere selectWhere = new SelectWhere();
+    private Select select = new Select();
 
     private String[] getTokens(String userCommand) {
         userCommand = userCommand.replace('(', '#').replace(')', ' ').trim();
@@ -85,7 +85,7 @@ class Insert {
                             isError = true;
                         }
                         if (columns.get(i).isPrimary()) {
-                            isError = selectWhere.isKeyAlreadyPresent("select * from " + tableName + " where "
+                            isError = select.isKeyAlreadyPresent("select * from " + tableName + " where "
                                     + columns.get(i).getColumnName() + "=" + values[i]);
                         }
                         if (isError)

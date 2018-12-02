@@ -10,7 +10,6 @@ public class Main {
     static Utility utility = Utility.getInstance();
     private static Help help = new Help();
     private static Select select = new Select();
-    private static SelectWhere selectWhere = new SelectWhere();
     private static Create create = new Create();
     private static Basic basic = new Basic();
     private static Insert insert = new Insert();
@@ -60,10 +59,7 @@ public class Main {
                 break;
 
             case "select":
-                if (userCommand.contains("where"))
-                    selectWhere.selectWhere(userCommand);
-                else
-                    select.select(userCommand);
+                select.select(userCommand);
                 break;
 
             case "use":
