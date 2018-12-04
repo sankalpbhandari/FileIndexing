@@ -126,7 +126,7 @@ public class Select {
                 table.close();
             }
         } catch (Exception e) {
-            System.out.println("Error, While fetching records from table");
+            System.out.println("Error, While fectching records from table");
         }
     }
 
@@ -267,7 +267,7 @@ public class Select {
                 table.close();
             }
         } catch (Exception e) {
-            System.out.println("Error, While fetching records from table");
+            System.out.println("Error, While fectching records from table");
         }
 
         return false;
