@@ -115,7 +115,7 @@ class Insert {
                         case "date":
                             recordSize += 8;
                             break;
-                        case "datetime":
+                        case "date_time":
                             recordSize += 8;
                             break;
                         default:
@@ -137,9 +137,9 @@ class Insert {
                 table_data.seek(pointer);
                 for (int i = 0; i < values.length; i++) {
                     String datatype = columns.get(i).getDataType();
-                    if (values[i].equals("null") || values[i] == null)
-                        datatype = "text";
                     values[i] = values[i].trim();
+                    if (values[i].equals("null") || values[i] == null)
+                        values[i] = "-999";
                     switch (datatype) {
                         case "int":
                             table_data.writeInt(Integer.parseInt(values[i]));
@@ -162,7 +162,7 @@ class Insert {
                         case "date":
                             table_data.writeLong(utility.convertStringToDate(values[i]));
                             break;
-                        case "datetime":
+                        case "date_time":
                             table_data.writeLong(Long.parseLong("0"));
                             break;
                         default:

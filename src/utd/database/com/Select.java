@@ -25,6 +25,8 @@ public class Select {
                 tableName = StringUtils.substringBetween(userCommand, "from", "where").trim();
                 filter = StringUtils.substringAfter(userCommand, "where").trim();
                 filterArray = filter.split("=");
+                filterArray[0] = filterArray[0].trim();
+                filterArray[1] = filterArray[1].trim();
             } else
                 tableName = StringUtils.substringAfter(userCommand, "from").trim();
             String[] user_cols = new String[0];
@@ -38,7 +40,7 @@ public class Select {
                         File.separator + utility.getSeletedDatabase() + File.separator + tableName + ".tbl",
                         "rw");
                 if (table.length() > 0L) {
-                    java.util.List<Column> columns = utility.getColumns(tableName);
+                    List<Column> columns = utility.getColumns(tableName);
                     table.readByte();
                     int cells = table.readByte();
                     table.readShort();
@@ -79,7 +81,7 @@ public class Select {
                                     map.put(column.getColumnName(), " " + table.readDouble());
                                 } else if (column.getDataType().equals("date")) {
                                     map.put(column.getColumnName(), " " + utility.convertDateToString(table.readLong()));
-                                } else if (column.getDataType().equals("datetime")) {
+                                } else if (column.getDataType().equals("date_time")) {
                                     map.put(column.getColumnName(), " " + utility.convertDateTimeToString(table.readLong()));
                                 } else {
                                     int length = table.readByte();
@@ -126,13 +128,15 @@ public class Select {
                 table.close();
             }
         } catch (Exception e) {
-            System.out.println("Error, While fectching records from table");
+            System.out.println("Error, While fetching records from table");
         }
     }
 
     private void printSome(String[] user_cols, Map<String, String> map) {
         for (String user_col : user_cols) {
             String name = map.get(user_col);
+            if(name.contains("-999"))
+                name = "NULL";
             System.out.print(name + "\t\t");
         }
         System.out.println();
@@ -141,6 +145,8 @@ public class Select {
     private void printAll(List<Column> columns, Map<String, String> map) {
         for (Column column : columns) {
             String name = map.get(column.getColumnName());
+            if(name.contains("-999"))
+                name = "NULL";
             System.out.print(name + "\t\t");
         }
         System.out.println();
@@ -152,6 +158,8 @@ public class Select {
             if (utility.isTablePresent(tableName, true)) {
                 String filter = userCommand.substring(userCommand.indexOf("where") + 5, userCommand.length()).trim();
                 String[] filterArray = filter.split("=");
+                filterArray[0] = filterArray[0].trim();
+                filterArray[1] = filterArray[1].trim();
                 RandomAccessFile table = new RandomAccessFile(IUtitlityConstants.DATABASE_PATH+
                         File.separator+utility.getSeletedDatabase() + File.separator + tableName + ".tbl",
                         "rw");
@@ -228,7 +236,7 @@ public class Select {
                                         return true;
                                     }
 
-                                } else if (column.getDataType().equals("datetime")) {
+                                } else if (column.getDataType().equals("date_time")) {
                                     String value = utility.convertDateTimeToString(table.readLong());
                                     if (column.getColumnName().equals(filterArray[0])) {
                                         if (!value.equals(filterArray[1]))
@@ -267,7 +275,7 @@ public class Select {
                 table.close();
             }
         } catch (Exception e) {
-            System.out.println("Error, While fectching records from table");
+            System.out.println("Error, While fetching records from table");
         }
 
         return false;

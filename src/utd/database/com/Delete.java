@@ -16,6 +16,8 @@ public class Delete {
             if (utility.isTablePresent(tableName, true)) {
                 String filter = userCommand.substring(userCommand.indexOf("where") + 5, userCommand.length()).trim();
                 String[] filterArray = filter.split("=");
+                filterArray[0] = filterArray[0].trim();
+                filterArray[1] = filterArray[1].trim();
                 RandomAccessFile table = new RandomAccessFile(IUtitlityConstants.DATABASE_PATH +
                         File.separator + utility.getSeletedDatabase() + File.separator + tableName + ".tbl","rw");
 
@@ -79,7 +81,7 @@ public class Delete {
                                             && (value.equals(filterArray[1]))) {
                                         isRemove = true;
                                     }
-                                } else if (column.getDataType().equals("datetime")) {
+                                } else if (column.getDataType().equals("date_time")) {
                                     String value = utility.convertDateTimeToString(table.readLong());
                                     if ((column.getColumnName().equals(filterArray[0]))
                                             && (value.equals(filterArray[1]))) {
