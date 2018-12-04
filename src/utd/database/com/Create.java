@@ -49,7 +49,7 @@ public class Create {
                             token = token.replace("not null", "notnull");
                         }
                         String columnAttr = tableName + "#"
-                                + token.replaceAll("  ", " ").replaceAll(" ", "#").trim();
+                                + token.replaceAll(" +", " ").replaceAll(" ", "#").trim();
                         columns.writeByte(columnAttr.length());
                         columns.writeBytes(columnAttr);
                     }
