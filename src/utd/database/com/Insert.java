@@ -81,8 +81,10 @@ class Insert {
             if (columns.size() == values.length) {
                 for (int i = 0; i < values.length; i++) {
                     if ((columns.get(i).isNotNullable()) || (columns.get(i).isPrimary())) {
+                        values[i] = values[i].trim();
                         if ((values[i] == null) || (values[i].equals("null"))) {
                             isError = true;
+                            break;
                         }
                         if (columns.get(i).isPrimary()) {
                             isError = select.isKeyAlreadyPresent("select * from " + tableName + " where "
@@ -137,6 +139,7 @@ class Insert {
                     String datatype = columns.get(i).getDataType();
                     if (values[i].equals("null") || values[i] == null)
                         datatype = "text";
+                    values[i] = values[i].trim();
                     switch (datatype) {
                         case "int":
                             table_data.writeInt(Integer.parseInt(values[i]));
@@ -145,7 +148,7 @@ class Insert {
                             table_data.writeByte(Byte.parseByte(values[i]));
                             break;
                         case "smallint":
-                            table_data.writeInt(Short.parseShort(values[i]));
+                            table_data.writeShort(Short.parseShort(values[i]));
                             break;
                         case "bigint":
                             table_data.writeLong(Long.parseLong(values[i]));
@@ -160,7 +163,7 @@ class Insert {
                             table_data.writeLong(utility.convertStringToDate(values[i]));
                             break;
                         case "datetime":
-                            table_data.writeLong(Long.parseLong(values[i]));
+                            table_data.writeLong(Long.parseLong("0"));
                             break;
                         default:
                             table_data.writeByte(values[i].length());

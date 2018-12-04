@@ -58,7 +58,7 @@ public class Utility {
                         if (column.length == 4) {
                             if (column[3].equals("primarykey")) {
                                 c.setPrimary(true);
-                            } else if (column[3].equals("notnullable")) {
+                            } else if (column[3].equals("notnull")) {
                                 c.setNotNullable(true);
                             }
                         }
